@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../Api";
 import { useNavigate } from "react-router-dom";
+import Popup from "../Popup/Popup";
 
 const Add = () => {
   const navigate = useNavigate();
@@ -12,10 +13,28 @@ const Add = () => {
     plot: "",
   });
 
+  const [newActorDetails, setNewActorDetails] = useState({
+    name: "",
+    gender: "",
+    dob: "",
+    bio: "",
+  });
+
+  const [newProducerDetails, setNewProducerDetails] = useState({
+    name: "",
+    gender: "",
+    dob: "",
+    bio: "",
+  });
+
   const [producersList, setProducersList] = useState([]);
   const [actorsList, setActorsList] = useState([]);
+  const [showAddActors, setShowAddActors] = useState(false);
+  const [showAddProducer, setShowAddProducer] = useState(false);
 
   const [selectedActors, setSelectedActors] = useState([]);
+
+  const genderList = ["Male", "Female", "Other"];
 
   const getAllProducersList = async () => {
     try {
@@ -46,14 +65,52 @@ const Add = () => {
     }
   };
 
+  const createActor = async (body) => {
+    try {
+      const res = await api.createActor(`/actors`, body);
+      if (res.status === 201) {
+        setShowAddActors(false);
+      }
+    } catch (error) {
+      console.error("Error fetching Movies:", error);
+    }
+  };
+
+  const createProducer = async (body) => {
+    try {
+      const res = await api.createProducer(`/producers`, body);
+      if (res.status === 201) {
+        setShowAddProducer(false);
+      }
+    } catch (error) {
+      console.error("Error fetching Movies:", error);
+    }
+  };
+
   useEffect(() => {
     getAllProducersList();
     getAllActorsList();
-  }, []);
+  }, [showAddActors, showAddProducer]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
+  const handleActorChange = (e) => {
+    const { name, value } = e.target;
+    setNewActorDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
+  const handleProducerChange = (e) => {
+    const { name, value } = e.target;
+    setNewProducerDetails((prevDetails) => ({
       ...prevDetails,
       [name]: value,
     }));
@@ -92,6 +149,14 @@ const Add = () => {
     createMovie(newDetails);
   };
 
+  const handleOnAddActorClick = () => {
+    createActor(newActorDetails);
+  };
+
+  const handleOnAddProducerClick = () => {
+    createProducer(newProducerDetails);
+  };
+
   return (
     <div
       style={{
@@ -101,6 +166,31 @@ const Add = () => {
         padding: "40px 0",
       }}
     >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "end",
+          width: "80%",
+          padding: "20px 0",
+        }}
+      >
+        <button
+          style={{ marginRight: "20px" }}
+          onClick={() => {
+            setShowAddActors(true);
+          }}
+        >
+          Add Actor
+        </button>
+        <button
+          onClick={() => {
+            setShowAddProducer(true);
+          }}
+        >
+          Add Producer
+        </button>
+      </div>
       <p style={{ marginBottom: "5px", fontWeight: "bold" }}>Movie Name</p>
       <input
         value={newDetails.name}
@@ -155,6 +245,120 @@ const Add = () => {
         ))}
       </select>
       <button onClick={handleOnSaveClick}>Save</button>
+      {showAddActors && (
+        <Popup setShow={setShowAddActors}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            <p style={{ marginBottom: "5px", fontWeight: "bold" }}>
+              Actor Name
+            </p>
+            <input
+              value={newActorDetails.name}
+              name="name"
+              onChange={handleActorChange}
+              style={{ marginBottom: "10px", width: "300px" }}
+            ></input>
+            <select
+              value={newActorDetails.gender}
+              name="gender"
+              onChange={handleActorChange}
+              style={{
+                marginBottom: "10px",
+                width: "300px",
+                marginTop: "20px",
+              }}
+            >
+              <option value="">Select Gender</option>
+              {genderList.map((each) => (
+                <option value={each}>{each}</option>
+              ))}
+            </select>
+            <p style={{ marginBottom: "2px", fontWeight: "bold" }}>Actor dob</p>
+            <p
+              style={{ marginBottom: "5px", fontWeight: "lighter" }}
+            >{`(YYYY-MM-DD)`}</p>
+            <input
+              value={newActorDetails.dob}
+              name="dob"
+              onChange={handleActorChange}
+              style={{ marginBottom: "10px", width: "300px" }}
+            ></input>
+            <p style={{ marginBottom: "2px", fontWeight: "bold" }}>Actor bio</p>
+            <input
+              value={newActorDetails.bio}
+              name="bio"
+              onChange={handleActorChange}
+              style={{ marginBottom: "10px", width: "300px" }}
+            ></input>
+            <button onClick={handleOnAddActorClick}>Add Actor</button>
+          </div>
+        </Popup>
+      )}
+      {showAddProducer && (
+        <Popup setShow={setShowAddProducer}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            <p style={{ marginBottom: "5px", fontWeight: "bold" }}>
+              Producer Name
+            </p>
+            <input
+              value={newProducerDetails.name}
+              name="name"
+              onChange={handleProducerChange}
+              style={{ marginBottom: "10px", width: "300px" }}
+            ></input>
+            <select
+              value={newProducerDetails.gender}
+              name="gender"
+              onChange={handleProducerChange}
+              style={{
+                marginBottom: "10px",
+                width: "300px",
+                marginTop: "20px",
+              }}
+            >
+              <option value="">Select Gender</option>
+              {genderList.map((each) => (
+                <option value={each}>{each}</option>
+              ))}
+            </select>
+            <p style={{ marginBottom: "2px", fontWeight: "bold" }}>
+              Producer dob
+            </p>
+            <p
+              style={{ marginBottom: "5px", fontWeight: "lighter" }}
+            >{`(YYYY-MM-DD)`}</p>
+            <input
+              value={newProducerDetails.dob}
+              name="dob"
+              onChange={handleProducerChange}
+              style={{ marginBottom: "10px", width: "300px" }}
+            ></input>
+            <p style={{ marginBottom: "2px", fontWeight: "bold" }}>
+              Producer bio
+            </p>
+            <input
+              value={newProducerDetails.bio}
+              name="bio"
+              onChange={handleProducerChange}
+              style={{ marginBottom: "10px", width: "300px" }}
+            ></input>
+            <button onClick={handleOnAddProducerClick}>Add Producer</button>
+          </div>
+        </Popup>
+      )}
     </div>
   );
 };

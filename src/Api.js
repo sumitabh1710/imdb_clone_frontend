@@ -118,6 +118,36 @@ const api = {
       throw error;
     }
   },
+
+  createActor: async (url, body) => {
+    try {
+      const response = await fetch(`${BASE_URL}${url}`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+      const data = response;
+      return data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  },
+
+  createProducer: async (url, body) => {
+    try {
+      const response = await fetch(`${BASE_URL}${url}`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+      const data = response;
+      return data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  },
 };
 
 export default api;
